@@ -1,0 +1,17 @@
+name: crystal_pong
+version: 0.1.0
+
+authors:
+  - rubynho <brunorafael6656@gmail.com>
+
+targets:
+  crystal_pong:
+    main: src/crystal_pong.cr
+
+crystal: 1.0.0
+
+license: MIT
+
+dependencies:
+  crsfml:
+    github: oprypin/crsfml
