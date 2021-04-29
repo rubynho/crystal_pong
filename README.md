@@ -1,18 +1,19 @@
-# crystal_pong
+# Crystal Pong
 
-TODO: Write a description here
+Implementing the old Pong game with Crystal and [CrSFML](https://github.com/oprypin/crsfml) following this video from [Tantan](https://www.youtube.com/watch?v=TUE_HSgQiG0&ab_channel=Tantan).
 
-## Installation
+## Running the game
 
-TODO: Write installation instructions here
+In order to run the game locally you will just need the latest version of Crystal and run the following command.
 
-## Usage
+- Fetch the dependencies and run the game:
+´´´bash
+$ shards install && crystal src/crystal_pong.cr
+´´´
 
-TODO: Write usage instructions here
+And voilà, the game is running.
 
-## Development
-
-TODO: Write development instructions here
+![pong-game](./assets/gameplay_example.gif)
 
 ## Contributing
 
