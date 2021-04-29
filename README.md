@@ -7,10 +7,9 @@ Implementing the old Pong game with Crystal and [CrSFML](https://github.com/opry
 In order to run the game locally you will just need the latest version of Crystal and run the following command.
 
 - Fetch the dependencies and run the game:
-
-´´´bash
+```bash
 $ shards install && crystal src/crystal_pong.cr
-´´´
+```
 
 And voilà, the game is running.
 
