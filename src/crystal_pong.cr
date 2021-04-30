@@ -71,7 +71,8 @@ module CrystalPong
 
   ball = SF::RectangleShape.new(SF.vector2(BALL_SIZE, BALL_SIZE))
 
-  font = SF::Font.from_file("/home/rubynho/Desktop/alterebro-pixel-font.ttf")
+  file_path = Path["assets/alterebro-pixel-font.ttf"].expand(home: true).to_s
+  font = SF::Font.from_file(file_path)
   scoreboard = SF::Text.new("#{main_state.player_1_score}      #{main_state.player_2_score}", font, 60)
   scoreboard.color = SF::Color::White
   scoreboard_width_half = scoreboard.local_bounds.width * 0.5
