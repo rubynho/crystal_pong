@@ -12,8 +12,8 @@ module CrystalPong
   WINDOW_HEIGHT_HALF = WINDOW_HEIGHT * 0.5
   WINDOW_WIDTH_HALF  = WINDOW_WIDTH * 0.5
 
-  RACKET_WIDTH       =  20
-  RACKET_HEIGHT      = 125
+  RACKET_WIDTH       =  20.0
+  RACKET_HEIGHT      = 125.0
   RACKET_WIDTH_HALF  = RACKET_WIDTH * 0.5
   RACKET_HEIGHT_HALF = RACKET_HEIGHT * 0.5
   RACKET_PADDING     = 50
@@ -27,6 +27,28 @@ module CrystalPong
   CENTER_LINE_THICKNESS = 3
 
   window = SF::RenderWindow.new(SF::VideoMode.new(WINDOW_WIDTH, WINDOW_HEIGHT), "Crystal Pong")
+
+  class Racket < SF::Transformable
+    include SF::Drawable
+
+    def initialize
+      super()
+
+      @shape = SF::RectangleShape.new(SF.vector2(RACKET_WIDTH, RACKET_HEIGHT))
+    end
+
+    def draw(target, states)
+      states.transform *= self.transform
+
+      target.draw(@shape, states)
+    end
+  end
+
+  left_racket = Racket.new
+  right_racket = Racket.new
+
+  left_racket.position = SF.vector2(RACKET_PADDING, WINDOW_HEIGHT_HALF - RACKET_HEIGHT_HALF)
+  right_racket.position = SF.vector2(WINDOW_WIDTH - RACKET_WIDTH - RACKET_PADDING, WINDOW_HEIGHT_HALF - RACKET_HEIGHT_HALF)
 
   struct MainState
     getter player_1_pos : Tuple(Int32, Int32)
@@ -66,9 +88,6 @@ module CrystalPong
 
   clock = SF::Clock.new
 
-  racket_1 = SF::RectangleShape.new(SF.vector2(RACKET_WIDTH, RACKET_HEIGHT))
-  racket_2 = SF::RectangleShape.new(SF.vector2(RACKET_WIDTH, RACKET_HEIGHT))
-
   ball = SF::RectangleShape.new(SF.vector2(BALL_SIZE, BALL_SIZE))
 
   file_path = Path["assets/alterebro-pixel-font.ttf"].expand(home: true).to_s
@@ -77,9 +96,6 @@ module CrystalPong
   scoreboard.color = SF::Color::White
   scoreboard_width_half = scoreboard.local_bounds.width * 0.5
   scoreboard.position = SF.vector2(WINDOW_WIDTH_HALF - scoreboard_width_half, 0.0)
-
-  racket_1.position = main_state.player_1_pos
-  racket_2.position = main_state.player_2_pos
 
   ball.position = main_state.ball_pos
 
@@ -101,10 +117,10 @@ module CrystalPong
     clamp(racket_1, 0.0, (WINDOW_HEIGHT - RACKET_HEIGHT).to_f)
     clamp(racket_2, 0.0, (WINDOW_HEIGHT - RACKET_HEIGHT).to_f)
 
-    racket_1.move(0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::W)
-    racket_1.move(0, PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::S)
-    racket_2.move(0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::Up)
-    racket_2.move(0, PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::Down)
+    left_racket.move(0.0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::W)
+    left_racket.move(0.0, PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::S)
+    right_racket.move(0.0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::Up)
+    right_racket.move(0.0, PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::Down)
 
     ball.position += main_state.ball_vel * dt
 
@@ -132,8 +148,8 @@ module CrystalPong
 
     scoreboard.string = "#{main_state.player_1_score}      #{main_state.player_2_score}"
 
-    window.draw(racket_1)
-    window.draw(racket_2)
+    window.draw(left_racket)
+    window.draw(right_racket)
     window.draw(ball)
     window.draw(scoreboard)
     window.draw(center_line)
