@@ -37,6 +37,18 @@ module CrystalPong
       @shape = SF::RectangleShape.new(SF.vector2(RACKET_WIDTH, RACKET_HEIGHT))
     end
 
+    def collides?(entity : SF::Shape)
+      global_bounds.intersects?(entity.global_bounds)
+    end
+
+    private def local_bounds
+      @shape.local_bounds
+    end
+
+    private def global_bounds
+      self.transform.transform_rect(local_bounds())
+    end
+
     def move(x, y)
       super(x, y)
 
@@ -155,9 +167,9 @@ module CrystalPong
       main_state.ball_vel.y = -main_state.ball_vel.y.abs
     end
 
-    if racket_1.global_bounds.intersects?(ball.global_bounds)
+    if left_racket.collides?(ball)
       main_state.ball_vel.x = main_state.ball_vel.y.abs
-    elsif racket_2.global_bounds.intersects?(ball.global_bounds)
+    elsif right_racket.collides?(ball)
       main_state.ball_vel.x = -main_state.ball_vel.y.abs
     end
 
