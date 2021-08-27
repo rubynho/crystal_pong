@@ -37,6 +37,24 @@ module CrystalPong
       @shape = SF::RectangleShape.new(SF.vector2(RACKET_WIDTH, RACKET_HEIGHT))
     end
 
+    def move(x, y)
+      super(x, y)
+
+      limit_movement()
+    end
+
+    # Limits the racket to pass the window boundaries (up and down).
+    private def limit_movement
+      low = 0.0
+      high = (WINDOW_HEIGHT - RACKET_HEIGHT).to_f
+
+      if self.position.y < low
+        self.position = {self.position.x, low}
+      elsif self.position.y > high
+        self.position = {self.position.x, high}
+      end
+    end
+
     def draw(target, states)
       states.transform *= self.transform
 
@@ -114,9 +132,6 @@ module CrystalPong
 
     window.clear
 
-    clamp(racket_1, 0.0, (WINDOW_HEIGHT - RACKET_HEIGHT).to_f)
-    clamp(racket_2, 0.0, (WINDOW_HEIGHT - RACKET_HEIGHT).to_f)
-
     left_racket.move(0.0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::W)
     left_racket.move(0.0, PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::S)
     right_racket.move(0.0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::Up)
@@ -155,13 +170,5 @@ module CrystalPong
     window.draw(center_line)
 
     window.display
-  end
-
-  def self.clamp(racket, low : Float64, high : Float64)
-    if racket.position[1] < low
-      racket.position = {racket.position[0], low}
-    elsif racket.position[1] > high
-      racket.position = {racket.position[0], high}
-    end
   end
 end
