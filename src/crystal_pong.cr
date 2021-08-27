@@ -19,7 +19,7 @@ module CrystalPong
   RACKET_PADDING     = 50
 
   BALL_SIZE   =    20
-  BALL_SPEED  = 180.0
+  BALL_SPEED  = 240.0
   BALL_RADIUS = BALL_SIZE * 0.5
 
   PLAYER_SPEED = 400
@@ -111,8 +111,7 @@ module CrystalPong
 
   ball = SF::RectangleShape.new(SF.vector2(BALL_SIZE, BALL_SIZE))
 
-  file_path = Path["assets/alterebro-pixel-font.ttf"].expand(home: true).to_s
-  font = SF::Font.from_file(file_path)
+  font = SF::Font.from_file("assets/alterebro-pixel-font.ttf")
   scoreboard = SF::Text.new("#{main_state.player_1_score}      #{main_state.player_2_score}", font, 60)
   scoreboard.color = SF::Color::White
   scoreboard_width_half = scoreboard.local_bounds.width * 0.5
@@ -142,6 +141,7 @@ module CrystalPong
 
     ball.position += main_state.ball_vel * dt
 
+    # score count
     if ball.position.x < 0.0
       main_state.reset_ball(ball)
       main_state.player_2_score += 1
