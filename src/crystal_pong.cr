@@ -81,9 +81,6 @@ module CrystalPong
   right_racket.position = SF.vector2(WINDOW_WIDTH - RACKET_WIDTH - RACKET_PADDING, WINDOW_HEIGHT_HALF - RACKET_HEIGHT_HALF)
 
   struct MainState
-    getter player_1_pos : Tuple(Int32, Int32)
-    getter player_2_pos : Tuple(Int32, Int32)
-
     getter ball_pos : Tuple(Int32, Int32)
     property ball_vel : SF::Vector2(Float64)
 
@@ -91,12 +88,6 @@ module CrystalPong
     property player_2_score : Int32
 
     def initialize
-      @player_1_pos = {RACKET_PADDING, (WINDOW_HEIGHT_HALF - RACKET_HEIGHT_HALF).to_i}
-      @player_2_pos = {
-        (WINDOW_WIDTH - RACKET_WIDTH - RACKET_PADDING).to_i,
-        (WINDOW_HEIGHT_HALF - RACKET_HEIGHT_HALF).to_i,
-      }
-
       @ball_pos = {WINDOW_WIDTH_HALF.to_i, (WINDOW_HEIGHT_HALF - BALL_RADIUS).to_i}
       @ball_vel = randomize_vec(SF::Vector2.new(0.0, 0.0), BALL_SPEED, BALL_SPEED)
 
