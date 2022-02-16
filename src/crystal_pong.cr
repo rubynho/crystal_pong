@@ -1,5 +1,7 @@
 require "crsfml"
 
+require "./entities/racket.cr"
+
 #################################
 # Pong game built with Crystal. #
 #################################
@@ -12,14 +14,14 @@ module CrystalPong
   WINDOW_HEIGHT_HALF = WINDOW_HEIGHT * 0.5
   WINDOW_WIDTH_HALF  = WINDOW_WIDTH * 0.5
 
-  RACKET_WIDTH       =  20
-  RACKET_HEIGHT      = 125
+  RACKET_WIDTH       =  20.0
+  RACKET_HEIGHT      = 125.0
   RACKET_WIDTH_HALF  = RACKET_WIDTH * 0.5
   RACKET_HEIGHT_HALF = RACKET_HEIGHT * 0.5
   RACKET_PADDING     = 50
 
   BALL_SIZE   =    20
-  BALL_SPEED  = 180.0
+  BALL_SPEED  = 240.0
   BALL_RADIUS = BALL_SIZE * 0.5
 
   PLAYER_SPEED = 400
@@ -28,10 +30,13 @@ module CrystalPong
 
   window = SF::RenderWindow.new(SF::VideoMode.new(WINDOW_WIDTH, WINDOW_HEIGHT), "Crystal Pong")
 
-  struct MainState
-    getter player_1_pos : Tuple(Int32, Int32)
-    getter player_2_pos : Tuple(Int32, Int32)
+  left_racket = Entities::Racket.new
+  right_racket = Entities::Racket.new
 
+  left_racket.position = SF.vector2(RACKET_PADDING, WINDOW_HEIGHT_HALF - RACKET_HEIGHT_HALF)
+  right_racket.position = SF.vector2(WINDOW_WIDTH - RACKET_WIDTH - RACKET_PADDING, WINDOW_HEIGHT_HALF - RACKET_HEIGHT_HALF)
+
+  struct MainState
     getter ball_pos : Tuple(Int32, Int32)
     property ball_vel : SF::Vector2(Float64)
 
@@ -39,12 +44,6 @@ module CrystalPong
     property player_2_score : Int32
 
     def initialize
-      @player_1_pos = {RACKET_PADDING, (WINDOW_HEIGHT_HALF - RACKET_HEIGHT_HALF).to_i}
-      @player_2_pos = {
-        (WINDOW_WIDTH - RACKET_WIDTH - RACKET_PADDING).to_i,
-        (WINDOW_HEIGHT_HALF - RACKET_HEIGHT_HALF).to_i,
-      }
-
       @ball_pos = {WINDOW_WIDTH_HALF.to_i, (WINDOW_HEIGHT_HALF - BALL_RADIUS).to_i}
       @ball_vel = randomize_vec(SF::Vector2.new(0.0, 0.0), BALL_SPEED, BALL_SPEED)
 
@@ -66,20 +65,13 @@ module CrystalPong
 
   clock = SF::Clock.new
 
-  racket_1 = SF::RectangleShape.new(SF.vector2(RACKET_WIDTH, RACKET_HEIGHT))
-  racket_2 = SF::RectangleShape.new(SF.vector2(RACKET_WIDTH, RACKET_HEIGHT))
-
   ball = SF::RectangleShape.new(SF.vector2(BALL_SIZE, BALL_SIZE))
 
-  file_path = Path["assets/alterebro-pixel-font.ttf"].expand(home: true).to_s
-  font = SF::Font.from_file(file_path)
+  font = SF::Font.from_file("assets/alterebro-pixel-font.ttf")
   scoreboard = SF::Text.new("#{main_state.player_1_score}      #{main_state.player_2_score}", font, 60)
   scoreboard.color = SF::Color::White
   scoreboard_width_half = scoreboard.local_bounds.width * 0.5
   scoreboard.position = SF.vector2(WINDOW_WIDTH_HALF - scoreboard_width_half, 0.0)
-
-  racket_1.position = main_state.player_1_pos
-  racket_2.position = main_state.player_2_pos
 
   ball.position = main_state.ball_pos
 
@@ -98,16 +90,14 @@ module CrystalPong
 
     window.clear
 
-    clamp(racket_1, 0.0, (WINDOW_HEIGHT - RACKET_HEIGHT).to_f)
-    clamp(racket_2, 0.0, (WINDOW_HEIGHT - RACKET_HEIGHT).to_f)
-
-    racket_1.move(0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::W)
-    racket_1.move(0, PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::S)
-    racket_2.move(0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::Up)
-    racket_2.move(0, PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::Down)
+    left_racket.move(0.0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::W)
+    left_racket.move(0.0, PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::S)
+    right_racket.move(0.0, -PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::Up)
+    right_racket.move(0.0, PLAYER_SPEED * dt) if SF::Keyboard.key_pressed?(SF::Keyboard::Down)
 
     ball.position += main_state.ball_vel * dt
 
+    # score count
     if ball.position.x < 0.0
       main_state.reset_ball(ball)
       main_state.player_2_score += 1
@@ -124,28 +114,20 @@ module CrystalPong
       main_state.ball_vel.y = -main_state.ball_vel.y.abs
     end
 
-    if racket_1.global_bounds.intersects?(ball.global_bounds)
+    if left_racket.collides?(ball)
       main_state.ball_vel.x = main_state.ball_vel.y.abs
-    elsif racket_2.global_bounds.intersects?(ball.global_bounds)
+    elsif right_racket.collides?(ball)
       main_state.ball_vel.x = -main_state.ball_vel.y.abs
     end
 
     scoreboard.string = "#{main_state.player_1_score}      #{main_state.player_2_score}"
 
-    window.draw(racket_1)
-    window.draw(racket_2)
+    window.draw(left_racket)
+    window.draw(right_racket)
     window.draw(ball)
     window.draw(scoreboard)
     window.draw(center_line)
 
     window.display
-  end
-
-  def self.clamp(racket, low : Float64, high : Float64)
-    if racket.position[1] < low
-      racket.position = {racket.position[0], low}
-    elsif racket.position[1] > high
-      racket.position = {racket.position[0], high}
-    end
   end
 end
